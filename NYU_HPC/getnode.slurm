@@ -1,0 +1,11 @@
+#!/bin/bash
+#SBATCH --open-mode=truncate
+#SBATCH --output=/scratch/%u/projects/video_prediction_project/logs/%x.out
+#SBATCH --error=/scratch/%u/projects/video_prediction_project/logs/%x.err
+#SBATCH --export=ALL
+#SBATCH --time=04:00:00
+#SBATCH --gres=gpu:1
+#SBATCH --mem=64G 
+#SBATCH -c 8
+
+sleep 4h
