@@ -20,4 +20,3 @@
 8. Under the section “Host burstinstance burstinstancecontainer” update Hostname to the node ID.
 9. In the Terminal window where you’re logged into your GPU instance, run `cd ~/video_prediction_project/demo`.
 10. Run `sbatch demo.slurm`.
-11. Go to VSCode and connect to burstinstancecontainer to open your IDE within the burst instance container.
