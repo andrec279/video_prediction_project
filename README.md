@@ -1,6 +1,6 @@
 # Video Prediction Project
 
-## Steps to access GCP Cluster Compute Node:
+## Steps to access and run scripts on GCP Cluster Compute Node:
 
 1. SSH into Greene: 
     1. `ssh greene` (must have ~/.ssh/config file configured properly to do this)
