@@ -15,8 +15,9 @@
         2. Follow instructions to [generate an SSH private key](https://docs.github.com/en/authentication/connecting-to-github-with-ssh/generating-a-new-ssh-key-and-adding-it-to-the-ssh-agent). Make sure you’re following the Linux instructions and complete all steps EXCEPT the section “Generating a new SSH key for a hardware security key”.
         3. Follow instructions to [add your new SSH key to your Github profile](https://docs.github.com/en/authentication/connecting-to-github-with-ssh/adding-a-new-ssh-key-to-your-github-account). Again, make sure to follow the instructions for Linux.
 5. Run step 3.2 to launch a GPU instance for development / testing.
-6. Once you are in bash-4.4, run `squeue -u $USER` and copy the the node ID under the “NODELIST(REASON)” column (e.g. b-3-106).
-7. Open a new terminal window (on local computer) and run `vim ~/.ssh/config`.
-8. Under the section “Host burstinstance burstinstancecontainer” update Hostname to the node ID.
-9. In the Terminal window where you’re logged into your GPU instance, run `cd ~/video_prediction_project/demo`.
+6. Make sure you're seeing bash-4.4 in your terminal indicating you're on the GPU instance.
+7. Make sure you have the most updated version of this repo in your home (~) directory. Run `cd ~/video_prediction_project` and if the folder isn't found, clone this repository into your home directory then `cd` into it.
+8. Make sure you have your .py file you want to run in the root of your video_prediction_project folder.
+9. Put /usr/bin/python3 [filename].py inside the quotes at the end of demo.slurm file, where [filename].py is the python file you want to run. You can add an additional line for any other python files you want to run as well.
 10. Run `sbatch demo.slurm`.
+11. Look at the logs corresponding to the job to see the output of your file.
