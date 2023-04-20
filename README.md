@@ -17,8 +17,8 @@
         1. Run `cd ~` to make sure you’re in your home directory
         2. Follow instructions to [generate an SSH private key](https://docs.github.com/en/authentication/connecting-to-github-with-ssh/generating-a-new-ssh-key-and-adding-it-to-the-ssh-agent). Make sure you’re following the Linux instructions and complete all steps EXCEPT the section “Generating a new SSH key for a hardware security key”.
         3. Follow instructions to [add your new SSH key to your Github profile](https://docs.github.com/en/authentication/connecting-to-github-with-ssh/adding-a-new-ssh-key-to-your-github-account). Again, make sure to follow the instructions for Linux.
-7. Go into the project directory: `cd ~/video_prediction_project.git`
-8. Make sure your repo is up to date. Run `git pull`
+7. Go into the project directory: `cd ~/video_prediction_project`
+8. Make sure your repo is up to date: `git pull`
 9. Make sure you have your .py file you want to run in the root of your video_prediction_project folder.
 10. Put /usr/bin/python3 [filename].py inside the quotes at the end of demo.slurm file, where [filename].py is the python file you want to run. You can add an additional line for any other python files you want to run as well.
 11. Run `sbatch demo.slurm`.
