@@ -5,10 +5,25 @@ from torch.utils.data import Dataset, DataLoader
 from torchvision import datasets, transforms
 from PIL import Image
 
+def batch_cov(x):
+    # data input of size (batch_size, num_samples, embed_size)
+    b, n, m = x.size()
+
+    # Flatten the tensor to size (b*n, m)
+    flat_tensor = x.view(b*n, -1)
+
+    # Compute the covariance matrix (b*n, b*n)
+    cov_matrix = torch.matmul(flat_tensor, flat_tensor.transpose(1, 0))
+
+    return cov_matrix
+
 def off_diagonal(x):
-    b, n, m = x.shape
+    n, m = x.shape
     assert n == m
-    return x[0].flatten()[:-1].view(n - 1, n + 1)[:, 1:].flatten()
+    indices = torch.triu_indices(n, n, offset=1)
+    flattened_tensor = x.flatten()
+    off_diagonal_tensor = flattened_tensor[indices[0]*(n) + indices[1]]
+    return off_diagonal_tensor
 
 class MyDataset(Dataset):
     def __init__(self, inputs, labels):
