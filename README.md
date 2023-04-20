@@ -19,11 +19,11 @@
         3. Follow instructions to [add your new SSH key to your Github profile](https://docs.github.com/en/authentication/connecting-to-github-with-ssh/adding-a-new-ssh-key-to-your-github-account). Again, make sure to follow the instructions for Linux.
 7. Go into the project directory: `cd ~/video_prediction_project`
 8. Make sure your repo is up to date: `git pull`
-9. Download the dataset into your folder:
+9. Download the dataset into your folder (this will download the zipped dataset from Andre's Google Drive):
 
 ```
 pip install gdown
-gdown https://drive.google.com/uc?id=1Ta34nFFoDqOKgoqoJ5fnE85i_9vcDfCr
+gdown https://drive.google.com/u/0/uc?id=1P7PC3EMaK11wJ3-VLIoTIUAHxbiKQkJN&export=download
 ```
 
 11. Make sure you have your .py file you want to run in the root of your video_prediction_project folder.
