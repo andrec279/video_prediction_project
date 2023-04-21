@@ -1,26 +1,24 @@
-# Video Prediction Project
-
-## Running Code on the Cluster
+# Instructions for Running Code on the Cluster
 Working on Greene can be very confusing. One key concept to keep in mind is we refer to four different "workspaces" that are important to keep straight: local (your computer), Greene login, Greene compute, and Greene compute container. 
     a. Local is self explanatory.
     b. Greene login is the entry point into the Greene cluster that you access when you run `ssh greene` after properly configuring your .ssh/config file (see part 1 for what I mean by this). You should use this to request compute nodes for running your code as well as organizing your scratch folder, which is shared across all nodes on the Greene cluster.
     c. Greene compute is the compute node you can request from Greene login. This is where you will launch your Singularity instance from.
     d. Greene compute container is your Singularity instance that is running on Greene compute. This has your full conda environment with all your dependencies, and is what you will connect your VSCode instance to if you want to do remote development or run code remotely.
 
-### Part 1: Configuring your .ssh/config file
+## Part 1: Configuring your .ssh/config file
 To connect to the Greene cluster, you must first make sure you have your SSH settings configured properly on your local drive at `~/.ssh/config`. If this file does not exist on your computer yet, run `touch ~/.ssh/config`. Once you have verified this file exists, follow the steps outlined below:
 1. Open your ~/.ssh/config file using your desired bash text editor (running `vim ~/.ssh/config` or `nano ~/.ssh/config` are both good options)
 2. If your ~/.ssh/config file does not look like the one provided in this repository (see example_ssh_config_file), copy the contents of example_ssh_config_file into your ~/.ssh/config file but change all NetID references (where it says alc9635) to your own.
 3. Save and close your ~/.ssh/config file.
 
-### Part 2: One time setup of your project folder on Greene
+## Part 2: One time setup of your project folder on Greene
 
 1. SSH into Greene: `ssh greene` (this will work only if your ~/.ssh/config file is set up properly, see Part 1 if you haven't done this yet)
 2. Go to your scratch folder: `cd /scratch/[YOUR_NETID_HERE]`
 3. If you don't have this repository in your scratch folder, git clone it into your scratch folder.
 4. Run `cd video_prediction_project/NYU_HPC`, then from that folder run `make build`. This will tell bash to start building the overlays that will inject a conda environment with all our requirements into our Singularity instance. After you've done this once, you won't need to do it again (it takes a long time to run).
 
-### Part 3: Launching a Greene compute node, starting Singularity instance on it, and connecting your VSCode instance
+## Part 3: Launching a Greene compute node, starting Singularity instance on it, and connecting your VSCode instance
 After setting up Parts 1 and 2, this is the only section you'll need to run each time you want to connect to a Greene compute node to do remote development / run model training or any other GPU-intensive tasks.
 
 1. SSH into Greene login: `ssh greene`
