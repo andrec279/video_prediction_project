@@ -21,7 +21,7 @@ path = 'Dataset_Student/unlabeled/video_'
 to_tensor = transforms.ToTensor()
 
 data_x = []
-for video in range(2000, 3000): # eventually use 15000
+for video in tqdm(range(2000, 3000)): # eventually use 15000
     # get the image path for each frame of each video
     img_path = path + str(video)
     video = []
@@ -39,7 +39,7 @@ print('Final Size of data_x tensor:', data_x.size()) # (number of videos, number
 
 # load in data from 22nd (last) frame for each video
 data_y = []
-for video in range(2000, 3000): # eventually use 15000
+for video in tqdm(range(2000, 3000)): # eventually use 15000
     # get the image path for the 22nd frame of each video
     img_path = path + str(video)
     fin_path = os.path.join(img_path, 'image_21.png')
@@ -52,41 +52,40 @@ data_y = data_y.reshape(data_y.size(0), data_y.size(1)*data_y.size(2), data_y.si
 print('Final Size of data_y tensor:', data_y.size()) # (number of videos, number of frames*color channels, image width, image height)
 
 # batch size for training
-batch_size = 8
+batch_size = 64
 
 # feed into dataloader
 data = u.MyDataset(data_x, data_y)
-dataloader = torch.utils.data.DataLoader(data, batch_size=batch_size, shuffle=False)
+dataloader = torch.utils.data.DataLoader(data, batch_size=batch_size, shuffle=True)
 
 # set parameters for patch embeddings
 image_size = (160, 240)
-patch_size = 4
+patch_size = 20
 embed_dim = 64
-expander_out = 4096
+expander_out = 256
 
-model = m.VICReg(image_size, patch_size, embed_dim, expander_out=expander_out)
+model = m.VICReg(image_size, patch_size, embed_dim, expander_out=expander_out).to(device)
 
 # pretrain
 import time
 
-num_epochs = 2
-optimizer = torch.optim.AdamW(model.parameters(), lr=0.001)
+num_epochs = 10
+optimizer = torch.optim.Adam(model.parameters(), lr=0.001)
 
 t0 = time.time()
 for epoch in range(num_epochs):
     model.train()
     epoch_loss = []
-    i = 0
     for data in tqdm(dataloader, desc=f'epoch {epoch}'):
         x, y = data
+        x = x.to(device)
+        y = y.to(device)
         optimizer.zero_grad()
         loss = model(x, y)
         
         epoch_loss.append(loss.item())
         loss.backward()
         optimizer.step()
-        i += 1
-        if i > 1: break
     print(f'Epoch {epoch} loss: {np.mean(epoch_loss)}')
     
 print(f'Finished training in {(time.time()-t0)/60} minutes')

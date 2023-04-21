@@ -31,9 +31,6 @@ singularity exec --containall --no-home -B $HOME/.ssh \
     --overlay $PROJECT_ROOT/scripts/overlays/overlay-base.ext3:ro \
     $IMAGE_DIRECTORY/pytorch_22.08-py3.sif /bin/bash << 'EOF'
 source ~/.bashrc
-conda activate /ext3/conda/zillow_MMKG
-conda install -y pytest 
-conda install -c conda-forge -y hydra-core omegaconf
-TMPDIR=/dev/shm pip install ftfy regex tqdm pytorch-lightning pycocotools datasets[vision] pyrootutils
-TMPDIR=/dev/shm pip install dgl-cu116 dglgo -f https://data.dgl.ai/wheels/repo.html
+conda activate /ext3/conda/dlproj
+TMPDIR=/dev/shm pip install matplotlib tqdm imageio
 EOF

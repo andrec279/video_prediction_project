@@ -1,9 +1,6 @@
 env:
 	@export PROJECT_ROOT=${PWD}
 	
-run: env
-	@./launch_job.sh launch.slurm
-
 build: env
 	@./scripts/layer_setup.sh
 

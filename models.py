@@ -52,7 +52,7 @@ class VICReg(nn.Module):
 
     def forward(self, x, y):
       # x and y shape (batch_size, in channels, image width, image height)
-      s_x = self.encoder_x(x)
+      s_x = self.encoder_x(x) 
       s_y = self.encoder_y(y)
 
       # pass the embeddings through the expander heads to increase channels
@@ -60,7 +60,7 @@ class VICReg(nn.Module):
       v_y = self.expander(s_y)
 
       # pass s_x through predictor to get s_yhat
-      s_yhat = self.predictor(s_x)
+      s_yhat = self.predictor(s_x) # s_yhat represents the predicted patch representations of image y given first 11 images
       repr_loss = F.mse_loss(s_yhat, s_y)
 
       # normalize the data across each embedding (is this necessary??)
