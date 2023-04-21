@@ -1,0 +1,61 @@
+Host nyugateway
+  User alc9635
+  Hostname gw.hpc.nyu.edu
+  ForwardAgent yes
+  ControlPath ~/.ssh/.%r@%h:%p
+  ControlMaster auto
+  ControlPersist yes
+
+# The main control node for Greene
+Host greene
+  User alc9635
+  Hostname greene.hpc.nyu.edu
+  ForwardAgent yes
+  ProxyJump nyugateway
+  UserKnownHostsFile=/dev/null
+  StrictHostKeyChecking=no
+
+
+# Greene compute nodes (added by Andre on 10/3/22)
+Host greenecompute greenecomputecontainer
+  Hostname gv016
+  ForwardAgent yes
+  User alc9635
+  ProxyJump greene
+  StrictHostKeyChecking no
+  UserKnownHostsFile /dev/null
+  LogLevel ERROR
+
+Host greenecomputecontainer
+  RemoteCommand singularity shell --containall --shell='/bin/bash' instance://mycontainer
+  RequestTTY yes
+
+# The control node for GCP bursting
+Host greeneburst
+  User alc9635
+  Hostname burst
+  ForwardAgent yes
+  ProxyJump greene
+
+# Your own instance that you have started on GCP
+# We also specify the same parameters for the container
+Host burstinstance burstinstancecontainer
+  User alc9635
+# Change as needed
+  Hostname b-3-40
+  ForwardAgent yes
+  ProxyJump greeneburst
+  UserKnownHostsFile=/dev/null
+  StrictHostKeyChecking=no
+
+# This is the configuration specific to the container
+# It runs an additional remote command
+Host burstinstancecontainer
+  RemoteCommand singularity shell --containall --shell='/bin/bash' instance://mycontainer
+  RequestTTY yes
+
+Host *
+  AddKeysToAgent yes
+  UseKeychain yes
+  IdentityFile ~/.ssh/id_ed25519
+  IdentityFile ~/.ssh/id_rsa
