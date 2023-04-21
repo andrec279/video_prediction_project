@@ -1,5 +1,6 @@
 Dataset_Student/
 .DS_Store
+NYU_HPC/scripts/overlays/
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
