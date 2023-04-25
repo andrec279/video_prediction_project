@@ -99,6 +99,7 @@ class Expander(nn.Module):
       x = self.relu(x)
       return x
    
+
 class Predictor(nn.Module):
    def __init__(self, input_size, hidden_sizes, output_size):
       super(Predictor, self).__init__()
@@ -126,3 +127,41 @@ class Predictor(nn.Module):
 
       output = self.output_layer(i)
       return output.reshape(x.size())
+   
+
+class MaskGeneration(nn.Module):
+   def __init__(self): 
+      super().__init__()
+     
+      self.conv1 = nn.Sequential(
+            nn.Conv2d(in_channels=1, out_channels=16, kernel_size=3, padding=1),
+            nn.BatchNorm2d(16),
+            nn.ReLU(),
+        )
+      
+      self.conv2 = nn.Sequential(
+          nn.Conv2d(in_channels=16, out_channels=49, kernel_size=3, padding=1, stride = 2), #48 classes (objects) + 1 background
+          nn.BatchNorm2d(49),
+          nn.ReLU(),
+      )
+      
+   def forward(self, x, verbose=False):
+      x1 = self.conv1(x)
+      x2 = self.conv2(x1)
+      conv_final = x2.view(x2.shape[0], 49, 160, 240)  # (N, C, H, W)      
+      return conv_final
+   
+
+class VideoPredictor(nn.Module):
+    def __init__(self, VICReg):
+        super().__init__()
+        self.VICReg = VICReg
+        self.MaskGenerator = MaskGeneration()
+    
+    def forward(self, x):
+        s_x = self.VICReg.encoder_x(x)
+        s_yhat = self.VICReg.predictor(s_x)
+        s_yhat = torch.unsqueeze(s_yhat, dim=1)
+        mask_pred = self.MaskGenerator(s_yhat)
+
+        return mask_pred
