@@ -21,6 +21,7 @@ class PretrainVICReg:
                  batch_size=32,
                  num_epochs=10,
                  lr=0.001,
+                 optimizer='Adam',
                  unlabeled_folder='Dataset_Student/unlabeled/'):
         
         self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
@@ -36,7 +37,15 @@ class PretrainVICReg:
     
         self.dataloader = u.create_pretrain_dataloader(unlabeled_folder, image_size, batch_size)
         self.VICReg_model = m.VICReg(image_size, patch_size, embed_dim, expander_out=expander_out).to(self.device)
-        self.optimizer = torch.optim.Adam(self.VICReg_model.parameters(), lr=lr)
+
+        if optimizer == 'Adam':
+            self.optimizer = torch.optim.Adam(self.VICReg_model.parameters(), lr=lr)
+        elif optimizer == 'SGD':
+            self.optimizer = torch.optim.SGD(self.VICReg_model.parameters(), lr=lr)
+        elif optimizer == 'AdamW':
+            self.optimizer = torch.optim.AdamW(self.VICReg_model.parameters(), lr=lr)
+        else:
+            raise ValueError('Invalid choice of optimizer, must be one of ["Adam", "SGD", "AdamW"]')
     
     
     def pretrain(self):

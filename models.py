@@ -130,22 +130,22 @@ class Predictor(nn.Module):
    
 
 class MaskGeneration(nn.Module):
-   def __init__(self): 
+   def __init__(self, kernel_size=3, padding=1, stride=2): 
       super().__init__()
      
       self.conv1 = nn.Sequential(
-            nn.Conv2d(in_channels=1, out_channels=16, kernel_size=3, padding=1),
+            nn.Conv2d(in_channels=1, out_channels=16, kernel_size=kernel_size, padding=padding),
             nn.BatchNorm2d(16),
             nn.ReLU(),
         )
       
       self.conv2 = nn.Sequential(
-          nn.Conv2d(in_channels=16, out_channels=49, kernel_size=3, padding=1, stride = 2), #48 classes (objects) + 1 background
+          nn.Conv2d(in_channels=16, out_channels=49, kernel_size=kernel_size, padding=padding, stride=stride), #48 classes (objects) + 1 background
           nn.BatchNorm2d(49),
           nn.ReLU(),
       )
       
-   def forward(self, x, verbose=False):
+   def forward(self, x):
       x1 = self.conv1(x)
       x2 = self.conv2(x1)
       conv_final = x2.view(x2.shape[0], 49, 160, 240)  # (N, C, H, W)      
@@ -153,10 +153,10 @@ class MaskGeneration(nn.Module):
    
 
 class VideoPredictor(nn.Module):
-    def __init__(self, VICReg):
+    def __init__(self, VICReg, kernel_size=3, padding=1, stride=2):
         super().__init__()
         self.VICReg = VICReg
-        self.MaskGenerator = MaskGeneration()
+        self.MaskGenerator = MaskGeneration(kernel_size, padding, stride)
     
     def forward(self, x):
         s_x = self.VICReg.encoder_x(x)
