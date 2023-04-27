@@ -1,3 +1,4 @@
+import numpy as np
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
@@ -70,15 +71,15 @@ def create_pretrain_dataloader(folder, image_size, batch_size):
     return dataloader
 
 
-def create_finetune_dataloader(folder, image_size, batch_size):
+def create_finetune_dataloader(folder, image_size, batch_size, train_or_val):
 
     to_tensor = transforms.ToTensor()
     list_video_paths = [folder + v for v in os.listdir(folder)]
 
-    if os.path.exists('data_x_finetune.pt') and os.path.exists('data_y_finetune.pt'):
-        print('loading finetuning data from disk...')
-        data_x = torch.load('data_x_finetune.pt')    
-        data_y = torch.load('data_y_finetune.pt')
+    if os.path.exists(f'data_x_finetune_{train_or_val}.pt') and os.path.exists(f'data_y_finetune_{train_or_val}.pt'):
+        print(f'loading {train_or_val} finetuning data from disk...')
+        data_x = torch.load(f'data_x_finetune_{train_or_val}.pt')    
+        data_y = torch.load(f'data_y_finetune_{train_or_val}.pt')
         print('done')
     
     else:
@@ -86,7 +87,7 @@ def create_finetune_dataloader(folder, image_size, batch_size):
         data_x = torch.empty(len(list_video_paths), 11, 3, image_size[0], image_size[1]) # first 11 frames of each video (B, n_frames, C, H, W)
 
         i = 0
-        for video_path in tqdm(list_video_paths, desc='creating data_x and data_y for finetuning'):
+        for video_path in tqdm(list_video_paths, desc=f'creating {train_or_val} data_x and data_y for finetuning'):
             last_mask = torch.Tensor(np.load(f"{video_path}/mask.npy"))[-1]
             last_mask[last_mask>48] = 0
             data_y[i] = last_mask
@@ -100,8 +101,8 @@ def create_finetune_dataloader(folder, image_size, batch_size):
             i += 1
 
         data_x = data_x.reshape(data_x.size(0), data_x.size(1)*data_x.size(2), data_x.size(3), data_x.size(4))
-        torch.save(data_x, 'data_x_finetune.pt')
-        torch.save(data_y, 'data_y_finetune.pt')
+        torch.save(data_x, f'data_x_finetune_{train_or_val}.pt')
+        torch.save(data_y, f'data_y_finetune_{train_or_val}.pt')
 
     video_prediction_data = VideoPredictionDataset(data_x, data_y)
     video_prediction_dataloader = torch.utils.data.DataLoader(video_prediction_data, batch_size=batch_size, shuffle=True)

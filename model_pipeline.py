@@ -34,6 +34,7 @@ def main():
         if not os.path.exists(config.pretrain_config['model_id']):
             raise ValueError(f'{config.pretrain_config["model_id"]} not found in directory, please check your spelling.')
         VICReg_model_path = config.pretrain_config['model_id']
+        print(f'loaded model {config.pretrain_config["model_id"]}')
 
     video_predictor_finetuning = FinetuneVideoPredictor(VICReg_model_path, 
                                                         patch_size=config.pretrain_config['patch_size'],

@@ -1,6 +1,6 @@
 pretrain_config = {
-    'pretrain': True,
-    'model_id': None,
+    'pretrain': False,
+    'model_id': 'VICReg_pretrained_1682484312.pth',
     'patch_size': 8,
     'embed_dim': 256,
     'expander_out': 600,
