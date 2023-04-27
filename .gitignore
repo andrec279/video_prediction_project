@@ -2,6 +2,9 @@ Dataset_Student/
 .DS_Store
 NYU_HPC/scripts/overlays/
 hidden/
+*.pt
+*.pth
+NYU_HPC/logs/
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
