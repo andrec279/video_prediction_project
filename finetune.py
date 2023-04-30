@@ -13,6 +13,9 @@ import torchmetrics
 
 import models as m
 import utils as u
+import gc
+
+torch.cuda.empty_cache()
 
 class FinetuneVideoPredictor:
     def __init__(self,
@@ -52,6 +55,8 @@ class FinetuneVideoPredictor:
     def finetune(self):
         train_losses = []
         val_losses = []
+        best_val_loss = 9999
+        time_best_val = round(time.time())
         for epoch in range(self.num_epochs):
             self.video_prediction_model.train()
             epoch_train_loss = []
@@ -68,6 +73,8 @@ class FinetuneVideoPredictor:
                 epoch_train_loss.append(loss.item())
                 loss.backward()
                 self.optimizer.step()
+                del x_train, y_train 
+                gc.collect()
 
             epoch_train_loss_mean = np.mean(epoch_train_loss)
             print(f'Epoch {epoch} train loss: {np.mean(epoch_train_loss)}')
@@ -83,11 +90,19 @@ class FinetuneVideoPredictor:
                     #input to the model should be patch_embeddings learned during pretraining
                     loss = self.criterion(y_val_pred, y_val)
                     epoch_val_loss.append(loss.item())
-                
+                    
+                    del x_val, y_val 
+                    gc.collect()
+                    
                 epoch_val_loss_mean = np.mean(epoch_val_loss)
                 print(f'Epoch {epoch} val loss: {np.mean(epoch_val_loss)}')
                 val_losses.append(epoch_val_loss_mean)
-            
+
+                if epoch_val_loss_mean < best_val_loss:
+                    best_val_loss = epoch_val_loss_mean
+                    self.best_model_name = f"video_predictor_finetuned_best_val_{time_best_val}.pth"
+                    torch.save(self.video_prediction_model.state_dict(), self.best_model_name)
+
         self.model_name = f"video_predictor_finetuned_{round(time.time())}.pth"
         torch.save(self.video_prediction_model.state_dict(), self.model_name)
         print('Successfully fine-tuned and saved video frame predictor model')
