@@ -48,7 +48,7 @@ class VICReg(nn.Module):
       self.encoder_x = EmbedPosEncoding(self.patch_embed_x, self.num_patches, embed_dim)
       self.encoder_y = EmbedPosEncoding(self.patch_embed_y, self.num_patches, embed_dim)
 
-      self.expander = Expander(self.num_patches, expander_out)
+      self.expander = Expander(self.num_patches*embed_dim, expander_out)
       self.predictor = Predictor(self.num_patches*embed_dim, hidden_sizes, self.num_patches*embed_dim)
 
     def forward(self, x, y):
@@ -87,18 +87,26 @@ class VICReg(nn.Module):
       return loss
 
 class Expander(nn.Module):
-   def __init__(self, in_channels, out_channels):
-      super(Expander, self).__init__()
-      # note trying conv transpose as suggested by ChatGPT, but could also try a MLP instead to expand channels
-      self.conv_transpose = nn.ConvTranspose1d(in_channels, out_channels, kernel_size=3, stride=2, padding=1)
-      self.bn = nn.BatchNorm1d(out_channels)
-      self.relu = nn.ReLU(inplace=True)
-
-   def forward(self, x):
-      x = self.conv_transpose(x)
-      x = self.bn(x)
-      x = self.relu(x)
-      return x
+    def __init__(self, in_channels, out_channels):
+        super(Expander, self).__init__()
+        self.fc1 = nn.Linear(in_channels, out_channels//3)
+        self.fc2 = nn.Linear(out_channels//3, out_channels//2)
+        self.fc3 = nn.Linear(out_channels//2, out_channels)
+        self.bn1 = nn.BatchNorm1d(out_channels//3)
+        self.bn2 = nn.BatchNorm1d(out_channels//2)
+        self.relu = nn.ReLU(inplace=True)
+        
+    def forward(self, x):
+        b, n, e = x.size()
+        x = x.reshape(b, -1)
+        x = self.fc1(x)
+        x = self.bn1(x)
+        x = self.relu(x)
+        x = self.fc2(x)
+        x = self.bn2(x)
+        x = self.relu(x)
+        x = self.fc3(x)
+        return x.reshape(b, -1, e)
    
 
 class Predictor(nn.Module):
