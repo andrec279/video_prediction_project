@@ -149,36 +149,6 @@ class MaskGeneration(nn.Module):
       x2 = self.conv2(x1)
       conv_final = x2.view(x2.shape[0], 49, 160, 240)  # (N, C, H, W)      
       return conv_final
-   
-
-# class MaskGenerationFFN(nn.Module):
-#    def __init__(self, input_size, hidden_sizes, output_size):
-#       super(Predictor, self).__init__()
-#       self.input_size = input_size
-#       self.hidden_sizes = hidden_sizes
-#       self.output_size = output_size
-
-#       self.hidden_layers = nn.ModuleList()
-#       in_size = input_size
-#       for h in hidden_sizes:
-#          self.hidden_layers.append(nn.Linear(in_size, h))
-#          self.hidden_layers.append(nn.BatchNorm1d(h))
-#          in_size = h
-
-#       self.output_layer = nn.Linear(in_size, output_size)
-
-#    def forward(self, x):
-#       # flatten input along last 2 dimensions
-#       i = x.reshape(x.size(0), -1)
-      
-#       for idx, layer in enumerate(self.hidden_layers):
-#          i = layer(i)
-#          if idx%2 != 0:
-#             i = F.relu(i)
-
-#       output = self.output_layer(i)
-#       return output.reshape(x.size())
-
 
 class VideoPredictor(nn.Module):
     def __init__(self, VICReg, kernel_size=3, padding=1, stride=2):
