@@ -1,4 +1,4 @@
-# Instructions for Running Code on the Cluster
+# Instructions for Running Code
 Working on Greene can be very confusing. One key concept to keep in mind is we refer to four different "workspaces" that are important to keep straight: local, Greene login, Greene compute, and Greene compute container. 
 
 - Local is your computer.
