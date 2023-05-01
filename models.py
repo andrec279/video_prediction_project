@@ -87,26 +87,18 @@ class VICReg(nn.Module):
       return loss
 
 class Expander(nn.Module):
-    def __init__(self, in_channels, out_channels):
-        super(Expander, self).__init__()
-        self.fc1 = nn.Linear(in_channels, out_channels//3)
-        self.fc2 = nn.Linear(out_channels//3, out_channels//2)
-        self.fc3 = nn.Linear(out_channels//2, out_channels)
-        self.bn1 = nn.BatchNorm1d(out_channels//3)
-        self.bn2 = nn.BatchNorm1d(out_channels//2)
-        self.relu = nn.ReLU(inplace=True)
-        
-    def forward(self, x):
-        b, n, e = x.size()
-        x = x.reshape(b, -1)
-        x = self.fc1(x)
-        x = self.bn1(x)
-        x = self.relu(x)
-        x = self.fc2(x)
-        x = self.bn2(x)
-        x = self.relu(x)
-        x = self.fc3(x)
-        return x.reshape(b, -1, e)
+   def __init__(self, in_channels, out_channels):
+      super(Expander, self).__init__()
+      # note trying conv transpose as suggested by ChatGPT, but could also try a MLP instead to expand channels
+      self.conv_transpose = nn.ConvTranspose1d(in_channels, out_channels, kernel_size=3, stride=1, padding=1) #change stride from 2 to 1
+      self.bn = nn.BatchNorm1d(out_channels)
+      self.relu = nn.ReLU(inplace=True)
+
+   def forward(self, x):
+      x = self.conv_transpose(x)
+      x = self.bn(x)
+      x = self.relu(x)
+      return x
    
 
 class Predictor(nn.Module):
@@ -141,54 +133,22 @@ class Predictor(nn.Module):
 class MaskGeneration(nn.Module):
    def __init__(self, kernel_size=3, padding=1, stride=2): 
       super().__init__()
-     
+      
       self.conv1 = nn.Sequential(
-            nn.Conv2d(in_channels=1, out_channels=16, kernel_size=kernel_size, padding=padding),
-            nn.BatchNorm2d(16),
-            nn.ReLU(),
+            nn.Conv2d(in_channels=1, out_channels=32, kernel_size=kernel_size, padding=padding),
+            nn.BatchNorm2d(32),
+            nn.Tanh()
         )
       
       self.conv2 = nn.Sequential(
-          nn.Conv2d(in_channels=16, out_channels=49, kernel_size=kernel_size, padding=padding, stride=stride), #48 classes (objects) + 1 background
-          nn.BatchNorm2d(49),
-          nn.ReLU(),
+          nn.Conv2d(in_channels=32, out_channels=49, kernel_size=kernel_size, padding=padding,stride=stride), #48 classes (objects) + 1 background
       )
-      
+
    def forward(self, x):
       x1 = self.conv1(x)
       x2 = self.conv2(x1)
       conv_final = x2.view(x2.shape[0], 49, 160, 240)  # (N, C, H, W)      
       return conv_final
-
-
-# class MaskGenerationFFN(nn.Module):
-#    def __init__(self, input_size, hidden_sizes, output_size):
-#       super(Predictor, self).__init__()
-#       self.input_size = input_size
-#       self.hidden_sizes = hidden_sizes
-#       self.output_size = output_size
-
-#       self.hidden_layers = nn.ModuleList()
-#       in_size = input_size
-#       for h in hidden_sizes:
-#          self.hidden_layers.append(nn.Linear(in_size, h))
-#          self.hidden_layers.append(nn.BatchNorm1d(h))
-#          in_size = h
-
-#       self.output_layer = nn.Linear(in_size, output_size)
-
-#    def forward(self, x):
-#       # flatten input along last 2 dimensions
-#       i = x.reshape(x.size(0), -1)
-      
-#       for idx, layer in enumerate(self.hidden_layers):
-#          i = layer(i)
-#          if idx%2 != 0:
-#             i = F.relu(i)
-
-#       output = self.output_layer(i)
-#       return output.reshape(x.size())
-
 
 class VideoPredictor(nn.Module):
     def __init__(self, VICReg, kernel_size=3, padding=1, stride=2):

@@ -21,19 +21,35 @@ To connect to the Greene cluster, you must first make sure you have your SSH set
 
 ```
 cd ~/Downloads
-scp Dataset_Student.zip [YOUR_NETID_HERE]@greene.hpc.nyu.edu:/scratch/[YOUR_NETID_HERE]/video_prediction_project
+scp Dataset_Student_V2.zip [YOUR_NETID_HERE]@greene.hpc.nyu.edu:/scratch/[YOUR_NETID_HERE]/video_prediction_project
 ```
 
 Then, go back to the Terminal that's connected to Greene login and run 
 
 ```
 cd video_prediction_project
-unzip Dataset_Student.zip
+unzip Dataset_Student_V2.zip
 ```
 
 you can delete the .zip file after this is done.
 
-5. Run `cd NYU_HPC`, then from that folder run `make build`. This will tell bash to start building the overlays that will inject a conda environment with all our requirements into our Singularity instance. After you've done this once, you won't need to do it again (it takes a long time to run).
+5. Similarly, make sure hidden folder on your Greene instance in your project folder. 
+
+```
+cd ~/Downloads
+scp hidden_set_for_leaderboard_1.zip [YOUR_NETID_HERE]@greene.hpc.nyu.edu:/scratch/[YOUR_NETID_HERE]/video_prediction_project
+```
+
+Then, go back to the Terminal that's connected to Greene login and run 
+
+```
+cd video_prediction_project
+unzip hidden_set_for_leaderboard_1.zip
+```
+you can delete the .zip file after this is done.
+
+
+6. Run `cd NYU_HPC`, then from that folder run `make build`. This will tell bash to start building the overlays that will inject a conda environment with all our requirements into our Singularity instance. After you've done this once, you won't need to do it again (it takes a long time to run).
 
 ## Part 3: Launching a Greene compute node and starting Singularity instance on it
 After setting up Parts 1 and 2, you can skip straight to Part 3 every time you want to connect to a Greene compute node to do remote development / run model training or any other GPU-intensive tasks.
@@ -71,3 +87,30 @@ Note: This may require some additional configuration with VSCode to get working.
 <img width="679" alt="image" src="https://user-images.githubusercontent.com/52364891/233743699-6f519b3d-080a-4534-afe8-de7da88f8f4f.png">
 
 6. You can now click the "Open Folder" button on the left hand navigation of VSCode and enter /scratch/[YOUR_NETID_HERE]/video_prediction_project/ to get to your project folder, and you can now directly edit the code on your Singularity instance. Note that when editing Jupyter notebooks, you'll need to select the kernel that corresponds to your conda environment name, which should work fine after you've downloaded the Python and Jupyter extensions for VSCode in your remote instance.
+
+
+## Part 6: Running our model
+
+In your singularity instance do the following:
+
+1. Make sure major packages are preinstalled
+    - Run `pip install -r requirements.txt`
+
+2. Use config.py file to set parameters for pretrain and finetune models. 
+    - If pretraining for the first time or reconfiguring the parameters set `pretrain` as `True` in config.py file and change parameters accordingly. Remember than the output dimension of the pretrain model must match dim for input dimension of the finetune model.  
+    - If using previously pretrained model, set `pretrain` as `False` and make sure `model_id` is the name of pretrained model you want to use.  
+        - Note: previously pretrained model is saved in your current directory as `VICReg_pretrained_{time}.pth`
+
+3. Pretrain and/or Finetune model 
+    -  Run `python model_pipeline.py` in your singularity
+    -  Once finished running new pretrained and finetuned models will be saved in your current directory. 
+        -  Best finetuned model is selected from the epoch with best validation loss and saved in your current directory as `video_predictor_finetuned_best_val_{time}.pth`
+
+4. Predict masks for hidden dataset 
+    - Update the file names of those two models (pretrain and finetuned) in the `submission.ipynb`
+        - run `ls -lah` to find the file names of the most recent models
+    - Run all codes in `submission.ipynb`
+    - Predicted masks for the hidden dataset will be a tensor of size (2000,160,240) and saved in `submitted_tensor_team12.pt`
+
+    
+
