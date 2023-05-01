@@ -1,4 +1,4 @@
-# Instructions for Running Code on the Cluster
+# Instructions for Running Code
 Working on Greene can be very confusing. One key concept to keep in mind is we refer to four different "workspaces" that are important to keep straight: local, Greene login, Greene compute, and Greene compute container. 
 
 - Local is your computer.
@@ -93,17 +93,17 @@ Note: This may require some additional configuration with VSCode to get working.
 
 In your singularity instance do the following:
 
-1. Make sure major packages are preinstalled
+1. Make sure all required packages are installed
     - Run `pip install -r requirements.txt`
 
 2. Use config.py file to set parameters for pretrain and finetune models. 
-    - If pretraining for the first time or reconfiguring the parameters set `pretrain` as `True` in config.py file and change parameters accordingly. Remember than the output dimension of the pretrain model must match dim for input dimension of the finetune model.  
+    - If you are pretraining for the first time or reconfiguring the pretraining parameters, set `pretrain` as `True` in config.py file and change parameters accordingly. Remember than the output dimension of the pretrain model must match dim for input dimension of the finetune model.  
     - If using previously pretrained model, set `pretrain` as `False` and make sure `model_id` is the name of pretrained model you want to use.  
         - Note: previously pretrained model is saved in your current directory as `VICReg_pretrained_{time}.pth`
 
 3. Pretrain and/or Finetune model 
     -  Run `python model_pipeline.py` in your singularity
-    -  Once finished running new pretrained and finetuned models will be saved in your current directory. 
+    -  Once it's finished running, the new pretrained and finetuned models will be saved in your current directory. 
         -  Best finetuned model is selected from the epoch with best validation loss and saved in your current directory as `video_predictor_finetuned_best_val_{time}.pth`
 
 4. Predict masks for hidden dataset 
