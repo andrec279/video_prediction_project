@@ -91,17 +91,26 @@ Note: This may require some additional configuration with VSCode to get working.
 
 ## Part 6: Running our model
 
-1. Use config.py file to set parameters for pretrain and finetune models. 
-    - If pretraining for the first time or reconfiguring the parameters set `pretrain` as `True` in config.py file. 
-    - If using previously pretrained model, set `pretrain` as `False` and make sure `model_id` is the name of pretrained model you want to use.  
+In your singularity instance do the following:
 
-2. Pretrain and/or Finetune model 
+1. Make sure major packages are preinstalled
+    - Run `pip install -r requirements.txt`
+
+2. Use config.py file to set parameters for pretrain and finetune models. 
+    - If pretraining for the first time or reconfiguring the parameters set `pretrain` as `True` in config.py file and change parameters accordingly. Remember than the output dimension of the pretrain model must match dim for input dimension of the finetune model.  
+    - If using previously pretrained model, set `pretrain` as `False` and make sure `model_id` is the name of pretrained model you want to use.  
+        - Note: previously pretrained model is saved in your current directory as `VICReg_pretrained_{time}.pth`
+
+3. Pretrain and/or Finetune model 
     -  Run `python model_pipeline.py` in your singularity
     -  Once finished running new pretrained and finetuned models will be saved in your current directory. 
+        -  Best finetuned model is selected from the epoch with best validation loss and saved in your current directory as `video_predictor_finetuned_best_val_{time}.pth`
 
-3. Predict masks for hidden dataset
-    - Update the file names of those two models (pretrain and finetuned) in the submission.ipynb 
-    - Run all codes in submission.ipynb 
-    - tensor of masks for the hidden dataset will be saved as submitted_tensor_team12.pt
+4. Predict masks for hidden dataset 
+    - Update the file names of those two models (pretrain and finetuned) in the `submission.ipynb`
+        - run `ls -lah` to find the file names of the most recent models
+    - Run all codes in `submission.ipynb`
+    - Predicted masks for the hidden dataset will be a tensor of size (2000,160,240) and saved in `submitted_tensor_team12.pt`
+
     
 
