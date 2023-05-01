@@ -109,6 +109,37 @@ def create_finetune_dataloader(folder, image_size, batch_size, train_or_val):
 
     return video_prediction_dataloader
 
+def create_hidden_dataloader(folder, image_size, batch_size, hidden_set):
+
+    to_tensor = transforms.ToTensor()
+    list_video_paths = [folder + v for v in os.listdir(folder)]
+
+    if os.path.exists(f'data_submission_{hidden_set}.pt'):
+        print(f'loading {hidden_set} finetuning data from disk...')
+        data_x = torch.load(f'data_submission_{hidden_set}.pt')    
+        print('done')
+    
+    else:
+        data_x = torch.empty(len(list_video_paths), 11, 3, image_size[0], image_size[1]) # all 11 frames of each video (B, n_frames, C, H, W)
+
+        i = 0
+        for video_path in tqdm(list_video_paths, desc=f'creating {hidden_set} data_x for submission'):
+            for frame in range(0, 11):
+                fin_path = os.path.join(video_path, 'image_' + str(frame)+ '.png')
+                img = Image.open(fin_path)
+                img = to_tensor(img)
+                data_x[i][frame] = img
+
+            i += 1
+
+        data_x = data_x.reshape(data_x.size(0), data_x.size(1)*data_x.size(2), data_x.size(3), data_x.size(4))
+        torch.save(data_x, f'data_submission_{hidden_set}.pt')
+
+    video_prediction_data = VideoPredictionDataset_hidden(data_x)
+    video_prediction_dataloader = torch.utils.data.DataLoader(video_prediction_data, batch_size=batch_size, shuffle=False)
+
+    return video_prediction_dataloader
+
 
 class PretrainDataset(Dataset):
     def __init__(self, inputs, labels):
@@ -136,3 +167,15 @@ class VideoPredictionDataset(Dataset):
         input_data = self.inputs[idx]
         label_data = self.labels[idx].to(torch.int64)
         return input_data, label_data
+    
+
+class VideoPredictionDataset_hidden(Dataset):
+    def __init__(self, inputs):
+        self.inputs = inputs
+        
+    def __len__(self):
+        return len(self.inputs)
+        
+    def __getitem__(self, idx):
+        input_data = self.inputs[idx]
+        return input_data
