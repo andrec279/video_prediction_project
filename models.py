@@ -48,7 +48,7 @@ class VICReg(nn.Module):
       self.encoder_x = EmbedPosEncoding(self.patch_embed_x, self.num_patches, embed_dim)
       self.encoder_y = EmbedPosEncoding(self.patch_embed_y, self.num_patches, embed_dim)
 
-      self.expander = Expander(self.num_patches, expander_out)
+      self.expander = Expander(self.num_patches*embed_dim, expander_out)
       self.predictor = Predictor(self.num_patches*embed_dim, hidden_sizes, self.num_patches*embed_dim)
 
     def forward(self, x, y):
