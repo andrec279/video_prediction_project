@@ -50,7 +50,8 @@ class FinetuneVideoPredictor:
         self.video_prediction_model = m.VideoPredictor(VICReg_model, kernel_size, padding, stride)
         self.video_prediction_model = self.video_prediction_model.to(self.device)
         self.optimizer = torch.optim.Adam(self.video_prediction_model.parameters(), lr=lr)
-        self.criterion = JaccardLoss(mode='multiclass', classes=49).to(self.device)
+        # self.criterion = JaccardLoss(mode='multiclass', classes=49).to(self.device)
+        self.criterion = nn.CrossEntropyLoss() 
     
     def finetune(self):
         train_losses = []
@@ -93,7 +94,7 @@ class FinetuneVideoPredictor:
                     
                     del x_val, y_val 
                     gc.collect()
-                    
+
                 epoch_val_loss_mean = np.mean(epoch_val_loss)
                 print(f'Epoch {epoch} val loss: {np.mean(epoch_val_loss)}')
                 val_losses.append(epoch_val_loss_mean)

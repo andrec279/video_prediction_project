@@ -21,19 +21,35 @@ To connect to the Greene cluster, you must first make sure you have your SSH set
 
 ```
 cd ~/Downloads
-scp Dataset_Student.zip [YOUR_NETID_HERE]@greene.hpc.nyu.edu:/scratch/[YOUR_NETID_HERE]/video_prediction_project
+scp Dataset_Student_V2.zip [YOUR_NETID_HERE]@greene.hpc.nyu.edu:/scratch/[YOUR_NETID_HERE]/video_prediction_project
 ```
 
 Then, go back to the Terminal that's connected to Greene login and run 
 
 ```
 cd video_prediction_project
-unzip Dataset_Student.zip
+unzip Dataset_Student_V2.zip
 ```
 
 you can delete the .zip file after this is done.
 
-5. Run `cd NYU_HPC`, then from that folder run `make build`. This will tell bash to start building the overlays that will inject a conda environment with all our requirements into our Singularity instance. After you've done this once, you won't need to do it again (it takes a long time to run).
+5. Similarly, make sure hidden folder on your Greene instance in your project folder. 
+
+```
+cd ~/Downloads
+scp hidden_set_for_leaderboard_1.zip [YOUR_NETID_HERE]@greene.hpc.nyu.edu:/scratch/[YOUR_NETID_HERE]/video_prediction_project
+```
+
+Then, go back to the Terminal that's connected to Greene login and run 
+
+```
+cd video_prediction_project
+unzip hidden_set_for_leaderboard_1.zip
+```
+you can delete the .zip file after this is done.
+
+
+6. Run `cd NYU_HPC`, then from that folder run `make build`. This will tell bash to start building the overlays that will inject a conda environment with all our requirements into our Singularity instance. After you've done this once, you won't need to do it again (it takes a long time to run).
 
 ## Part 3: Launching a Greene compute node and starting Singularity instance on it
 After setting up Parts 1 and 2, you can skip straight to Part 3 every time you want to connect to a Greene compute node to do remote development / run model training or any other GPU-intensive tasks.
@@ -71,3 +87,21 @@ Note: This may require some additional configuration with VSCode to get working.
 <img width="679" alt="image" src="https://user-images.githubusercontent.com/52364891/233743699-6f519b3d-080a-4534-afe8-de7da88f8f4f.png">
 
 6. You can now click the "Open Folder" button on the left hand navigation of VSCode and enter /scratch/[YOUR_NETID_HERE]/video_prediction_project/ to get to your project folder, and you can now directly edit the code on your Singularity instance. Note that when editing Jupyter notebooks, you'll need to select the kernel that corresponds to your conda environment name, which should work fine after you've downloaded the Python and Jupyter extensions for VSCode in your remote instance.
+
+
+## Part 6: Running our model
+
+1. Use config.py file to set parameters for pretrain and finetune models. 
+    - If pretraining for the first time or reconfiguring the parameters set `pretrain` as `True` in config.py file. 
+    - If using previously pretrained model, set `pretrain` as `False` and make sure `model_id` is the name of pretrained model you want to use.  
+
+2. Pretrain and/or Finetune model 
+    -  Run `python model_pipeline.py` in your singularity
+    -  Once finished running new pretrained and finetuned models will be saved in your current directory. 
+
+3. Predict masks for hidden dataset
+    - Update the file names of those two models (pretrain and finetuned) in the submission.ipynb 
+    - Run all codes in submission.ipynb 
+    - tensor of masks for the hidden dataset will be saved as submitted_tensor_team12.pt
+    
+

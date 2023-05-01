@@ -90,7 +90,7 @@ class Expander(nn.Module):
    def __init__(self, in_channels, out_channels):
       super(Expander, self).__init__()
       # note trying conv transpose as suggested by ChatGPT, but could also try a MLP instead to expand channels
-      self.conv_transpose = nn.ConvTranspose1d(in_channels, out_channels, kernel_size=3, stride=2, padding=1)
+      self.conv_transpose = nn.ConvTranspose1d(in_channels, out_channels, kernel_size=3, stride=1, padding=1) #change stride from 2 to 1
       self.bn = nn.BatchNorm1d(out_channels)
       self.relu = nn.ReLU(inplace=True)
 
@@ -133,25 +133,23 @@ class Predictor(nn.Module):
 class MaskGeneration(nn.Module):
    def __init__(self, kernel_size=3, padding=1, stride=2): 
       super().__init__()
-     
+      
       self.conv1 = nn.Sequential(
-            nn.Conv2d(in_channels=1, out_channels=16, kernel_size=kernel_size, padding=padding),
-            nn.BatchNorm2d(16),
-            nn.ReLU(),
+            nn.Conv2d(in_channels=1, out_channels=32, kernel_size=kernel_size, padding=padding),
+            nn.BatchNorm2d(32),
+            nn.Tanh()
         )
       
       self.conv2 = nn.Sequential(
-          nn.Conv2d(in_channels=16, out_channels=49, kernel_size=kernel_size, padding=padding, stride=stride), #48 classes (objects) + 1 background
-          nn.BatchNorm2d(49),
-          nn.ReLU(),
+          nn.Conv2d(in_channels=32, out_channels=49, kernel_size=kernel_size, padding=padding,stride=stride), #48 classes (objects) + 1 background
       )
-      
+
    def forward(self, x):
       x1 = self.conv1(x)
       x2 = self.conv2(x1)
       conv_final = x2.view(x2.shape[0], 49, 160, 240)  # (N, C, H, W)      
       return conv_final
-
+   
 
 # class MaskGenerationFFN(nn.Module):
 #    def __init__(self, input_size, hidden_sizes, output_size):
