@@ -3,3 +3,5 @@ torchvision
 tqdm
 matplotlib
 imageio
+segmentation_models_pytorch
+torchmetrics
